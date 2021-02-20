@@ -9,20 +9,25 @@ import { useRef, useState } from 'react';
 import { useForm, Controller } from "react-hook-form";
 import ReactHookFormSelect from '../components/form/ReactHookFormSelect';
 import PhoneInput from '../components/form/Phone';
-import MuiPhoneNumber from 'material-ui-phone-number';
+import DatePicker from '../components/form/DatePicker';
 
-import {
-  MuiPickersUtilsProvider,
-  // KeyboardTimePicker,
-  KeyboardDatePicker,
-} from '@material-ui/pickers';
+import MuiPhoneNumber from 'material-ui-phone-number';
+import axios from 'axios';
+import { Observable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { apiURL } from '../config';
+import ReactDirective from 'react-directive';
+import { FETCH_FAIL } from '../constant';
+import Alert from '@material-ui/lab/Alert';
+
 
 function Signup(props) {
-  const { register, errors, handleSubmit, control, getValues } = useForm({
+  const { register, errors, handleSubmit, control, getValues, setValue, watch } = useForm({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
-    defaultValues: {}
+    defaultValues: { dob: null }
   });
+  const [signedUp, setSignedUp] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [loading, setLoading] = useState(false);
   const onSubmit = data => {
@@ -30,13 +35,27 @@ function Signup(props) {
     setLoading(true);
 
     try {
-      //TODO
-    } catch(err) {
+      const postApi = request => from(axios({
+        url: apiURL + 'users',
+        method: 'POST',
+        data
+      })).pipe(map(res => res.data)).catch(error => {
+        setSubmitError(error);
+        return Observable.ofType(FETCH_FAIL)
+      });
+      postApi.subscribe((x) => {
+        console.log("subs!", x);
+      })
+      setSignedUp(true);
+
+    } catch (err) {
       setSubmitError(err);
     } finally {
       setLoading(false)
     }
   };
+
+  // console.log("errors.password", errors.password);
   const titles = ['Mr', 'Mrs', 'Prof'];
   const titleOption = [
     <MenuItem value="" key={0}>Your title</MenuItem>
@@ -45,10 +64,16 @@ function Signup(props) {
     const title = titles[c];
     titleOption.push(<MenuItem value={title} key={c + 1}>{title}</MenuItem>)
   }
+
   return <div className="App">
     <h1>Signup</h1>
     <Container fixed>
+      {signedUp && <div >
+        <h2>Thank you</h2>
+        We have submitted your application!
+      </div>}
       <form onSubmit={handleSubmit(onSubmit)}>
+        {submitError && <Alert severity="error">{submitError.message}</Alert>}
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} style={{ textAlign: 'left' }}>
 
@@ -92,46 +117,43 @@ function Signup(props) {
           <Grid item xs={12} md={6}>
             <TextField name="confirmEmail" required={true} label="Confirm Email" className="full" inputRef={register({
               validate: async (val) => {
-                  const email = getValues('email');
-                  console.log("validate", val, email, email === val);
-                  return email === val;
-                }, required: true, maxLength: 255
-              })} />
+                const email = getValues('email');
+                console.log("validate", val, email, email === val);
+                return email === val;
+              }, required: true, maxLength: 255
+            })} />
             {errors.confirmEmail && errors.confirmEmail.type === 'required' && <span role="alert">Required</span>}
             {errors.confirmEmail && errors.confirmEmail.type === 'validate' && <span role="alert">Mismatch with email</span>}
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <MuiPickersUtilsProvider defaultValue="" name="dob" utils={DateFnsUtils} inputRef={register({ required: true, valueAsDate: true, })}>
-              <KeyboardDatePicker
-                margin="normal"
-                id="date-picker-dialog"
-                label="Date of birth"
-                format="MM/dd/yyyy"
-                className="full"
-                // value={selectedDate}
-                // onChange={handleDateChange}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date',
-                }}
-              />
-            </MuiPickersUtilsProvider>
+            <DatePicker className="full" control={control} format="dd/MM/yyyy" watch={watch} setValue={setValue} getValues={getValues} defaultValue="" name="dob" inputRef={register({ required: true, valueAsDate: true, })} />
+
             {errors.dob && <span role="alert">{errors.dob.message}</span>}
           </Grid>
 
           <Grid item xs={12} md={6}>
             {/* <MuiPhoneNumber name="mobile" defaultCountry={'my'} inputRef={register({ required: true, maxLength: 20 })}/> */}
-            <PhoneInput name="phone" label="Phone Number" className="full" inputRef={register({ pattern: {
+            <PhoneInput name="phone" label="Phone Number" className="full" inputRef={register({
+              pattern: {
                 value: /^[0-9]{3,}-[0-9]{5,}-[0-9]{3,}$/,
                 message: "invalid format"
-              }, maxLength: 20 })} />
+              }, maxLength: 20
+            })} />
             {errors.phone && <span role="alert">{errors.phone.message}</span>}
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <TextField name="password" label="Password" type="password" className="full" inputRef={register({ required: true, maxLength: 255 })} />
+            <TextField name="password" label="Password" type="password" className="full" inputRef={register({
+              pattern: {
+                value: /^[a-zA-Z0-9]*$/,
+                message: "invalid format"
+              }, required: true, minLength: 8, maxLength: 20
+            })} />
             {errors.password && errors.password.type === 'required' && <span role="alert">Required</span>}
-            {errors.password && <span role="alert">{errors.password.message}</span>}
+            {errors.password && errors.password.type === 'minLength' && <span role="alert">Password too short, min 8 charactors</span>}
+            {errors.password && errors.password.type === 'maxLength' && <span role="alert">Password too long</span>}
+            {errors.password && errors.password.type === 'pattern' && <span role="alert">Password must be alphanumeric only</span>}
           </Grid>
 
           <Grid item xs={12}>
