@@ -13,13 +13,14 @@ import DatePicker from '../components/form/DatePicker';
 
 import MuiPhoneNumber from 'material-ui-phone-number';
 import axios from 'axios';
-import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 import { apiURL } from '../config';
 import ReactDirective from 'react-directive';
 import { FETCH_FAIL } from '../constant';
 import Alert from '@material-ui/lab/Alert';
-
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 function Signup(props) {
   const { register, errors, handleSubmit, control, getValues, setValue, watch } = useForm({
@@ -28,6 +29,8 @@ function Signup(props) {
     defaultValues: { dob: null }
   });
   const [signedUp, setSignedUp] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
+  const [signedUpID, setSignedUpID] = useState(null);
   const [submitError, setSubmitError] = useState(null);
   const [loading, setLoading] = useState(false);
   const onSubmit = data => {
@@ -35,18 +38,55 @@ function Signup(props) {
     setLoading(true);
 
     try {
-      const postApi = request => from(axios({
+      setSubmitError(null);
+      //   let postApi$ = Observable.create( ( observer ) => {
+      //     axios({
+      //       url: apiURL + 'users',
+      //       method: 'POST',
+      //       data
+      //     })
+      //     .then( ( response ) => {
+      //         observer.next( response.data );
+      //         observer.complete();
+      //     } )
+      //     .catch( ( error ) => {
+      //         observer.error( error );
+      //     } );
+      // } );
+
+      const postApi = from(axios({
         url: apiURL + 'users',
         method: 'POST',
         data
-      })).pipe(map(res => res.data)).catch(error => {
-        setSubmitError(error);
-        return Observable.ofType(FETCH_FAIL)
-      });
-      postApi.subscribe((x) => {
+      })).pipe(switchMap(res => {
+        console.log("pipedswitchmap1", res);
+        return [res.data];
+      }),
+        catchError(err => {
+          console.error("axios error", err);
+          // setSubmitError(err);
+          throw err;
+          // return of({ error: true, message: err.message })
+        })
+      );
+      console.log("postapi", postApi);
+      postApi.subscribe(async (x) => {
         console.log("subs!", x);
-      })
-      setSignedUp(true);
+        setSignedUpID(x.id);
+        setSignedUp(true);
+
+        await axios({
+          url: apiURL + 'login',
+          method: 'POST',
+          data: { email: x.email, password: getValues("password") }
+        }).then((resp) => {
+          setSignedIn(true);
+        }).catch((err) => {
+          console.error("login error", err);
+          // throw Error("Unable to login");
+          setSubmitError(Error(`Unable to login: ${err.message}`));
+        })
+      });
 
     } catch (err) {
       setSubmitError(err);
@@ -71,9 +111,25 @@ function Signup(props) {
       {signedUp && <div >
         <h2>Thank you</h2>
         We have submitted your application!
+
+        Your id is {signedUpID}
+      </div>}
+      {signedIn && <div>
+        You are now logged in...  
       </div>}
       <form onSubmit={handleSubmit(onSubmit)}>
-        {submitError && <Alert severity="error">{submitError.message}</Alert>}
+        {submitError && <Alert severity="error" action={
+          <IconButton
+            aria-label="close"
+            color="inherit"
+            size="small"
+            onClick={() => {
+              setSubmitError(null);
+            }}
+          >
+            <CloseIcon fontSize="inherit" />
+          </IconButton>
+        }>{submitError.message}</Alert>}
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} style={{ textAlign: 'left' }}>
 
@@ -118,7 +174,6 @@ function Signup(props) {
             <TextField name="confirmEmail" required={true} label="Confirm Email" className="full" inputRef={register({
               validate: async (val) => {
                 const email = getValues('email');
-                console.log("validate", val, email, email === val);
                 return email === val;
               }, required: true, maxLength: 255
             })} />
