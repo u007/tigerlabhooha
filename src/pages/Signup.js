@@ -25,12 +25,12 @@ import Dialog from '../components/dialog';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { useDialogStyles } from '../components/styles/dialog.style';
 
-
+const errorRequired = 'field is blank, please fill in';
 function Signup(props) {
   const { register, errors, handleSubmit, control, getValues, setValue, watch, formState } = useForm({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
-    defaultValues: { dob: '' }
+    defaultValues: { dob: new Date(1980,1,1) }
   });
   const [signedUp, setSignedUp] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
@@ -154,13 +154,13 @@ function Signup(props) {
 
           <Grid item xs={12} md={6}>
             <TextField name="firstName" className="full" label="First Name" required={true} inputRef={register({ pattern: /^[A-Za-z]+$/i, required: true, maxLength: 255 })} />
-            {errors.firstName && errors.firstName.type === 'required' && <span role="alert">Required</span>}
+            {errors.firstName && errors.firstName.type === 'required' && <span role="alert">{errorRequired}</span>}
             {errors.firstName && <span role="alert">{errors.firstName.message}</span>}
           </Grid>
 
           <Grid item xs={12} md={6}>
             <TextField name="lastName" required={true} label="Last Name" className="full" inputRef={register({ pattern: /^[A-Za-z]+$/i, required: true, maxLength: 255 })} />
-            {errors.lastName && errors.lastName.type === 'required' && <span role="alert">Required</span>}
+            {errors.lastName && errors.lastName.type === 'required' && <span role="alert">{errorRequired}</span>}
             {errors.lastName && <span role="alert">{errors.lastName.message}</span>}
           </Grid>
 
@@ -175,7 +175,7 @@ function Signup(props) {
                 message: "invalid format"
               }, required: true, maxLength: 255
             })} />
-            {errors.email && errors.email.type === 'required' && <span role="alert">Required</span>}
+            {errors.email && errors.email.type === 'required' && <span role="alert">{errorRequired}</span>}
             {errors.email && <span role="alert">{errors.email.message}</span>}
           </Grid>
 
@@ -190,13 +190,13 @@ function Signup(props) {
                 return email === val;
               }, required: true, maxLength: 255
             })} />
-            {errors.confirmEmail && errors.confirmEmail.type === 'required' && <span role="alert">Required</span>}
+            {errors.confirmEmail && errors.confirmEmail.type === 'required' && <span role="alert">{errorRequired}</span>}
             {errors.confirmEmail && errors.confirmEmail.type === 'validate' && <span role="alert">Mismatch with email</span>}
           </Grid>
 
           <Grid item xs={12} md={6}>
             <DatePicker className="full" control={control} format="dd/MM/yyyy" watch={watch} setValue={setValue} value={getValues('dob')} getValues={getValues} defaultValue="" name="dob" inputRef={register({ required: true, valueAsDate: true, })} />
-
+            {getValues('dob') && getValues('dob').getFullYear()}
             {errors.dob && <span role="alert">{errors.dob.message}</span>}
           </Grid>
 
@@ -223,7 +223,7 @@ function Signup(props) {
                 message: "invalid format"
               }, required: true, minLength: 8, maxLength: 20
             })} />
-            {errors.password && errors.password.type === 'required' && <span role="alert">Required</span>}
+            {errors.password && errors.password.type === 'required' && <span role="alert">{errorRequired}</span>}
             {errors.password && errors.password.type === 'minLength' && <span role="alert">Password too short, min 8 charactors</span>}
             {errors.password && errors.password.type === 'maxLength' && <span role="alert">Password too long</span>}
             {errors.password && errors.password.type === 'pattern' && <span role="alert">Password must be alphanumeric only</span>}

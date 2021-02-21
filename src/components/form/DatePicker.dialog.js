@@ -5,12 +5,13 @@ import ClearIcon from "@material-ui/icons/Clear";
 import { IconButton } from "@material-ui/core";
 import DateFnsUtils from '@date-io/date-fns';
 import {
+  DatePicker,
   MuiPickersUtilsProvider,
   // KeyboardTimePicker,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
 
-const DatePicker = ({
+const DatePickerDialog = ({
   name,
   label,
   control,
@@ -24,6 +25,9 @@ const DatePicker = ({
   inputRef,
   ...props
 }) => {
+
+  const dateValue = value && value instanceof Date ? value: null;
+
   return (
     <FormControl {...props}>
       <Controller
@@ -35,7 +39,7 @@ const DatePicker = ({
                 label={label}
                 format={format}
                 className="full"
-                value={value}
+                value={dateValue}
                 // onChange={handleDateChange}
                 KeyboardButtonProps={{
                   'aria-label': 'change date',
@@ -44,13 +48,13 @@ const DatePicker = ({
                   console.log('picked', name, e);
                   setValue(name, e);
                 }}
-                InputProps={{
-                  endAdornment: (
-                    <IconButton onClick={(e) => setValue(name, null)}>
-                      <ClearIcon />
-                    </IconButton>
-                  )
-                }}
+                // InputProps={{
+                //   endAdornment: (
+                //     <IconButton onClick={(e) => setValue(name, null)}>
+                //       <ClearIcon />
+                //     </IconButton>
+                //   )
+                // }}
               />
             </MuiPickersUtilsProvider>
           }
@@ -69,8 +73,7 @@ const DatePicker = ({
           autoOk
           margin="normal"
       />
-      {value && value.getYear()}
     </FormControl>
   );
 };
-export default DatePicker;
+export default DatePickerDialog;
