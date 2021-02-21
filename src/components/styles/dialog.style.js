@@ -1,11 +1,15 @@
 import { makeStyles } from '@material-ui/core/styles';
 
-export const useDialogStyles = (width = 500, border = '1px solid #000', padding = null) => {
+export const useDialogStyles = (height = 'auto', width = 500, border = '1px solid #000', padding = null, zIndex = 100) => {
   return makeStyles((theme) => ({
     paper: {
+      zIndex: zIndex,
       position: 'absolute',
-      left: '50%',
-      marginLeft: '-' + (width / 2) + 'px',
+      height: height,
+      // left: '50%',
+      margin: 'auto',
+      // marginLeft: '-' + (width / 2) + 'px',
+      top: 0, left: 0, bottom: 0, right: 0,
       width: width,
       backgroundColor: theme.palette.background.paper,
       border: border,

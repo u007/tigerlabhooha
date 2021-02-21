@@ -18,7 +18,9 @@ const ReactHookFormSelect = ({
       <InputLabel id={labelId}>{label}</InputLabel>
       <Controller
         as={
-          <Select labelId={labelId} label={label}>
+          <Select labelId={labelId} label={label} InputRef={(ref) => {
+            console.log("select", ref)
+          }}>
             {children}
           </Select>
         }

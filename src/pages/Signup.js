@@ -30,7 +30,7 @@ function Signup(props) {
   const { register, errors, handleSubmit, control, getValues, setValue, watch, formState } = useForm({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
-    defaultValues: { dob: new Date(1980,1,1) }
+    defaultValues: { }
   });
   const [signedUp, setSignedUp] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
@@ -61,11 +61,11 @@ function Signup(props) {
       );
       console.log("postapi", postApi);
       postApi.subscribe(async (data) => {
-        console.log("subs!", data);
+        console.log("subs!", data, data.id);
         setSignedUpID(data.id);
+
+
         setSignedUp(true);
-
-
       });
 
     } catch (err) {
@@ -84,13 +84,21 @@ function Signup(props) {
     }).then((resp) => {
       setSignedIn(true);
     }).catch((err) => {
-      console.error("login error", err);
+      console.log("login error", err, err.response);
       // throw Error("Unable to login");
-      setSubmitError(Error(`Unable to login: ${err.message}`));
+      if (err.response && err.response.status === 400) {
+        setSubmitError(Error('The user with ID and email cannot be logged in.'));
+      } else {
+        setSubmitError(Error(`Unable to login: ${err.message}`));
+      }
     })
   }
 
-  console.log("formState", formState);
+  const clearSubmitError = () => {
+    setSubmitError(null);
+  }
+
+  console.log("formState", formState, errors);
   // console.log("errors.password", errors.password);
   const titles = ['Mr', 'Mrs', 'Prof'];
   const titleOption = [
@@ -102,26 +110,28 @@ function Signup(props) {
   }
 
   const modalStyle = useDialogStyles()();
-  console.log('modalStyle.paper222', modalStyle);
+  // console.log('modalStyle.paper222', modalStyle);
   return <div className="App">
     <h1>Signup</h1>
     <Container fixed>
-      {signedUp && <Dialog title="Signup" isOpen={signedUp} >
+      {signedUp && <Dialog title="Signup" isOpen={signedUp} onClose={(e) => {setSignedUp(false) } }>
         <div className={modalStyle.paper}>
-          <h2>Thank you</h2>
-          Your application has been submitted!
-          <p>
-          Your id is {signedUpID}
-          </p>
-          <p>
-          <Button variant="contained" color="primary" className="full" onClick={doSignin}>Sign in</Button>
-          </p>
+          <div style={{position: 'relative'}}>
+            <h2>Thank you</h2>
+            Your application has been submitted!
+            <p>
+              Your id is {signedUpID}
+            </p>
+            <p>
+              <Button variant="contained" color="primary" className="full" onClick={doSignin}>Sign in</Button>
+            </p>
+          </div>
         </div>
       </Dialog>}
       {signedIn && <div>
         You are now logged in...
       </div>}
-      {loading && <CircularProgress />}
+      {loading && <CircularProgress>loading...</CircularProgress>}
       <form onSubmit={handleSubmit(onSubmit)}>
         {submitError && <Alert severity="error" action={
           <IconButton
@@ -135,6 +145,20 @@ function Signup(props) {
             <CloseIcon fontSize="inherit" />
           </IconButton>
         }>{submitError.message}</Alert>}
+
+        {submitError && <div className={modalStyle.paper} onClose={clearSubmitError}>
+          <div style={{position: 'relative'}}>
+            <h2>Sorry</h2>
+          An error occured:
+          <p>
+              {submitError.message}
+            </p>
+            <p>
+              <Button variant="contained" color="primary" className="full" onClick={clearSubmitError}>Okay</Button>
+            </p>
+          </div>
+        </div>}
+
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} style={{ textAlign: 'left' }}>
 
@@ -195,8 +219,7 @@ function Signup(props) {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <DatePicker className="full" control={control} format="dd/MM/yyyy" watch={watch} setValue={setValue} value={getValues('dob')} getValues={getValues} defaultValue="" name="dob" inputRef={register({ required: true, valueAsDate: true, })} />
-            {getValues('dob') && getValues('dob').getFullYear()}
+            <DatePicker className="full" control={control} format="dd/MM/yyyy" watch={watch} setValue={setValue} value={getValues('dob')} getValues={getValues} defaultValue="" name="dob" inputRef={register({ valueAsDate: true, })} />
             {errors.dob && <span role="alert">{errors.dob.message}</span>}
           </Grid>
 
