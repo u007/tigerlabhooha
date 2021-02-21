@@ -239,7 +239,7 @@ function Signup(props) {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <DatePicker className="full" control={control} format="dd/MM/yyyy" watch={watch} setValue={setValue} value={getValues('dob')} getValues={getValues} defaultValue="" name="dob" inputRef={register({ valueAsDate: true, })} />
+            <DatePicker label="Date of birth" className="full" control={control} format="dd/MM/yyyy" watch={watch} setValue={setValue} value={getValues('dob')} getValues={getValues} defaultValue="" name="dob" inputRef={register({ valueAsDate: true, })} />
             {errors.dob && <span role="alert">{errors.dob.message}</span>}
           </Grid>
 
