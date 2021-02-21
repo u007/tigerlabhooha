@@ -1,6 +1,7 @@
 
 # setup
 
+Tested on node v12.20.1
 ```
 npm install
 ```
