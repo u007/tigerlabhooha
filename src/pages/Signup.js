@@ -9,7 +9,7 @@ import { useRef, useState } from 'react';
 import { useForm, Controller } from "react-hook-form";
 import ReactHookFormSelect from '../components/form/ReactHookFormSelect';
 import PhoneInput from '../components/form/Phone';
-import DatePicker from '../components/form/DatePicker';
+import DatePicker from '../components/form/DatePicker.dialog';
 
 import MuiPhoneNumber from 'material-ui-phone-number';
 import axios from 'axios';
@@ -21,12 +21,16 @@ import { FETCH_FAIL } from '../constant';
 import Alert from '@material-ui/lab/Alert';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import Dialog from '../components/dialog';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { useDialogStyles } from '../components/styles/dialog.style';
+
 
 function Signup(props) {
-  const { register, errors, handleSubmit, control, getValues, setValue, watch } = useForm({
+  const { register, errors, handleSubmit, control, getValues, setValue, watch, formState } = useForm({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
-    defaultValues: { dob: null }
+    defaultValues: { dob: '' }
   });
   const [signedUp, setSignedUp] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
@@ -39,20 +43,6 @@ function Signup(props) {
 
     try {
       setSubmitError(null);
-      //   let postApi$ = Observable.create( ( observer ) => {
-      //     axios({
-      //       url: apiURL + 'users',
-      //       method: 'POST',
-      //       data
-      //     })
-      //     .then( ( response ) => {
-      //         observer.next( response.data );
-      //         observer.complete();
-      //     } )
-      //     .catch( ( error ) => {
-      //         observer.error( error );
-      //     } );
-      // } );
 
       const postApi = from(axios({
         url: apiURL + 'users',
@@ -70,22 +60,12 @@ function Signup(props) {
         })
       );
       console.log("postapi", postApi);
-      postApi.subscribe(async (x) => {
-        console.log("subs!", x);
-        setSignedUpID(x.id);
+      postApi.subscribe(async (data) => {
+        console.log("subs!", data);
+        setSignedUpID(data.id);
         setSignedUp(true);
 
-        await axios({
-          url: apiURL + 'login',
-          method: 'POST',
-          data: { email: x.email, password: getValues("password") }
-        }).then((resp) => {
-          setSignedIn(true);
-        }).catch((err) => {
-          console.error("login error", err);
-          // throw Error("Unable to login");
-          setSubmitError(Error(`Unable to login: ${err.message}`));
-        })
+
       });
 
     } catch (err) {
@@ -95,6 +75,22 @@ function Signup(props) {
     }
   };
 
+  const doSignin = async () => {
+    setSignedUp(false);//hide dialog
+    await axios({
+      url: apiURL + 'login',
+      method: 'POST',
+      data: { email: getValues('email'), password: getValues("password") }
+    }).then((resp) => {
+      setSignedIn(true);
+    }).catch((err) => {
+      console.error("login error", err);
+      // throw Error("Unable to login");
+      setSubmitError(Error(`Unable to login: ${err.message}`));
+    })
+  }
+
+  console.log("formState", formState);
   // console.log("errors.password", errors.password);
   const titles = ['Mr', 'Mrs', 'Prof'];
   const titleOption = [
@@ -105,18 +101,27 @@ function Signup(props) {
     titleOption.push(<MenuItem value={title} key={c + 1}>{title}</MenuItem>)
   }
 
+  const modalStyle = useDialogStyles()();
+  console.log('modalStyle.paper222', modalStyle);
   return <div className="App">
     <h1>Signup</h1>
     <Container fixed>
-      {signedUp && <div >
-        <h2>Thank you</h2>
-        We have submitted your application!
-
-        Your id is {signedUpID}
-      </div>}
+      {signedUp && <Dialog title="Signup" isOpen={signedUp} >
+        <div className={modalStyle.paper}>
+          <h2>Thank you</h2>
+          Your application has been submitted!
+          <p>
+          Your id is {signedUpID}
+          </p>
+          <p>
+          <Button variant="contained" color="primary" className="full" onClick={doSignin}>Sign in</Button>
+          </p>
+        </div>
+      </Dialog>}
       {signedIn && <div>
-        You are now logged in...  
+        You are now logged in...
       </div>}
+      {loading && <CircularProgress />}
       <form onSubmit={handleSubmit(onSubmit)}>
         {submitError && <Alert severity="error" action={
           <IconButton
@@ -160,7 +165,11 @@ function Signup(props) {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <TextField name="email" label="Email" required={true} className="full" inputRef={register({
+            <TextField name="email" label="Email" required={true} className="full" inputProps={{
+              form: {
+                autoComplete: 'off',
+              },
+            }} inputRef={register({
               pattern: {
                 value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
                 message: "invalid format"
@@ -171,7 +180,11 @@ function Signup(props) {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <TextField name="confirmEmail" required={true} label="Confirm Email" className="full" inputRef={register({
+            <TextField name="confirmEmail" required={true} label="Confirm Email" className="full" inputProps={{
+              form: {
+                autoComplete: 'off',
+              },
+            }} inputRef={register({
               validate: async (val) => {
                 const email = getValues('email');
                 return email === val;
@@ -182,7 +195,7 @@ function Signup(props) {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <DatePicker className="full" control={control} format="dd/MM/yyyy" watch={watch} setValue={setValue} getValues={getValues} defaultValue="" name="dob" inputRef={register({ required: true, valueAsDate: true, })} />
+            <DatePicker className="full" control={control} format="dd/MM/yyyy" watch={watch} setValue={setValue} value={getValues('dob')} getValues={getValues} defaultValue="" name="dob" inputRef={register({ required: true, valueAsDate: true, })} />
 
             {errors.dob && <span role="alert">{errors.dob.message}</span>}
           </Grid>
@@ -199,7 +212,12 @@ function Signup(props) {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <TextField name="password" label="Password" type="password" className="full" inputRef={register({
+            <TextField name="password" label="Password" type="password" className="full" inputProps={{
+              autoComplete: 'new-password',
+              form: {
+                autoComplete: 'off',
+              },
+            }} inputRef={register({
               pattern: {
                 value: /^[a-zA-Z0-9]*$/,
                 message: "invalid format"
