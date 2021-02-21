@@ -98,7 +98,7 @@ function Signup(props) {
     setSubmitError(null);
   }
 
-  console.log("formState", formState, errors);
+  console.log("errors?", errors);
   // console.log("errors.password", errors.password);
   const titles = ['Mr', 'Mrs', 'Prof'];
   const titleOption = [

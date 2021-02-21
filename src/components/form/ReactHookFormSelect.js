@@ -8,6 +8,7 @@ const ReactHookFormSelect = ({
   name,
   label,
   control,
+  required,
   defaultValue,
   children,
   ...props
@@ -24,6 +25,7 @@ const ReactHookFormSelect = ({
             {children}
           </Select>
         }
+        rules={{ required: required }}
         name={name}
         control={control}
         defaultValue={defaultValue}
@@ -31,4 +33,10 @@ const ReactHookFormSelect = ({
     </FormControl>
   );
 };
+
+
+ReactHookFormSelect.defaultProps = {
+  required: false
+};
+
 export default ReactHookFormSelect;

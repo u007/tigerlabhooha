@@ -23,6 +23,7 @@ const DatePickerDialog = ({
   watch,
   format,
   inputRef,
+  required,
   ...props
 }) => {
 
@@ -59,7 +60,7 @@ const DatePickerDialog = ({
             </MuiPickersUtilsProvider>
           }
           control={control}
-          rules={{ required: true }}
+          rules={{ required: required }}
           name={name}
           label={label}
           value={watch(name)}
@@ -76,4 +77,9 @@ const DatePickerDialog = ({
     </FormControl>
   );
 };
+
+DatePickerDialog.defaultProps = {
+  required: false
+};
+
 export default DatePickerDialog;
