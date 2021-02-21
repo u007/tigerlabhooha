@@ -26,3 +26,8 @@ code {
   margin-left:auto;
   margin-right:auto;
 }
+
+.MuiAppBar-colorPrimary a {
+  color: #fff;
+  text-decoration: none;
+}

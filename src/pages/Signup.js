@@ -22,7 +22,8 @@ import Alert from '@material-ui/lab/Alert';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Dialog from '../components/dialog';
-import CircularProgress from '@material-ui/core/CircularProgress';
+
+import { CircularProgress } from '@material-ui/core';
 import { useDialogStyles } from '../components/styles/dialog.style';
 
 const errorRequired = 'field is blank, please fill in';
@@ -30,7 +31,7 @@ function Signup(props) {
   const { register, errors, handleSubmit, control, getValues, setValue, watch, formState } = useForm({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
-    defaultValues: { }
+    defaultValues: {}
   });
   const [signedUp, setSignedUp] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
@@ -47,7 +48,10 @@ function Signup(props) {
       const postApi = from(axios({
         url: apiURL + 'users',
         method: 'POST',
-        data
+        // data
+        data: {
+          email: data.email
+        }
       })).pipe(switchMap(res => {
         console.log("pipedswitchmap1", res);
         return [res.data];
@@ -63,8 +67,6 @@ function Signup(props) {
       postApi.subscribe(async (data) => {
         console.log("subs!", data, data.id);
         setSignedUpID(data.id);
-
-
         setSignedUp(true);
       });
 
@@ -114,9 +116,9 @@ function Signup(props) {
   return <div className="App">
     <h1>Signup</h1>
     <Container fixed>
-      {signedUp && <Dialog title="Signup" isOpen={signedUp} onClose={(e) => {setSignedUp(false) } }>
+      {signedUp && <Dialog title="Signup" isOpen={signedUp} onClose={(e) => { setSignedUp(false) }}>
         <div className={modalStyle.paper}>
-          <div style={{position: 'relative'}}>
+          <div style={{ position: 'relative' }}>
             <h2>Thank you</h2>
             Your application has been submitted!
             <p>
@@ -131,7 +133,7 @@ function Signup(props) {
       {signedIn && <div>
         You are now logged in...
       </div>}
-      {loading && <CircularProgress>loading...</CircularProgress>}
+      {loading && <CircularProgress />}
       <form onSubmit={handleSubmit(onSubmit)}>
         {submitError && <Alert severity="error" action={
           <IconButton
@@ -146,8 +148,8 @@ function Signup(props) {
           </IconButton>
         }>{submitError.message}</Alert>}
 
-        {submitError && <div className={modalStyle.paper} onClose={clearSubmitError}>
-          <div style={{position: 'relative'}}>
+        {submitError && <Dialog title="Signup" isOpen={submitError} onClose={clearSubmitError}><div className={modalStyle.paper} >
+          <div style={{ position: 'relative' }}>
             <h2>Sorry</h2>
           An error occured:
           <p>
@@ -157,7 +159,8 @@ function Signup(props) {
               <Button variant="contained" color="primary" className="full" onClick={clearSubmitError}>Okay</Button>
             </p>
           </div>
-        </div>}
+        </div>
+        </Dialog>}
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} style={{ textAlign: 'left' }}>

@@ -22,8 +22,10 @@ const Dialog = ({allowClose, onClose, isOpen, title, description, children}) => 
       aria-labelledby={title}
       aria-describedby={description}
     >
+      <>
       {allowClose && onClose && <IconButton onClick={handleClose}><ClearIcon /></IconButton>}
       {children}
+      </>
     </Modal>
   )
 }
@@ -39,7 +41,7 @@ Dialog.propTypes = {
 Dialog.defaultProps = {
   title: '',
   description: '',
-  allowClose: true
+  allowClose: false
 };
 
 
