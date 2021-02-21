@@ -27,6 +27,13 @@ import { CircularProgress } from '@material-ui/core';
 import { useDialogStyles } from '../components/styles/dialog.style';
 
 const errorRequired = 'field is blank, please fill in';
+
+const existingEmails = [
+  'abc@example.com',
+  'james@example.com',
+  'banned@example.com'
+];
+
 function Signup(props) {
   const { register, errors, handleSubmit, control, getValues, setValue, watch, formState } = useForm({
     mode: 'onSubmit',
@@ -40,6 +47,10 @@ function Signup(props) {
   const [loading, setLoading] = useState(false);
   const onSubmit = data => {
     console.log("submit", data);
+    if (existingEmails.indexOf(data.email.toLowerCase()) >= 0) {
+      setSubmitError(Error('This Email exists'));
+      return;
+    }
     setLoading(true);
 
     try {
@@ -89,7 +100,7 @@ function Signup(props) {
       console.log("login error", err, err.response);
       // throw Error("Unable to login");
       if (err.response && err.response.status === 400) {
-        setSubmitError(Error('The user with ID and email cannot be logged in.'));
+        setSubmitError(Error(`The user with ID ${signedUpID} and email ${getValues('email')} cannot be logged in.`));
       } else {
         setSubmitError(Error(`Unable to login: ${err.message}`));
       }
@@ -149,14 +160,20 @@ function Signup(props) {
         }>{submitError.message}</Alert>}
 
         {submitError && <Dialog title="Signup" isOpen={submitError} onClose={clearSubmitError}><div className={modalStyle.paper} >
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative'}}>
             <h2>Sorry</h2>
-          An error occured:
-          <p>
+            <p>
               {submitError.message}
             </p>
             <p>
-              <Button variant="contained" color="primary" className="full" onClick={clearSubmitError}>Okay</Button>
+            <Grid container spacing={3} style={{}}>
+              <Grid item xs={12} md={6}>
+                <Button variant="contained" color="primary" className="full" onClick={clearSubmitError}>Ok</Button>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Button variant="contained" className="full" onClick={clearSubmitError}>Cancel</Button>
+              </Grid>
+            </Grid>
             </p>
           </div>
         </div>
