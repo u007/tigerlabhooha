@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import FormControl from '@material-ui/core/FormControl';
 import { Controller } from 'react-hook-form';
 import DateFnsUtils from '@date-io/date-fns';
+import enLocale from 'date-fns/locale/en-US';
 import {
   MuiPickersUtilsProvider,
   // KeyboardTimePicker,
@@ -14,23 +15,20 @@ const DatePickerDialog = ({
   label,
   control,
   defaultValue,
-  children,
   value,
   setValue,
-  getValues,
   watch,
   format,
-  inputRef,
   required,
-  ...props
+  className,
 }) => {
   const dateValue = value && value instanceof Date ? value : null;
 
   return (
-    <FormControl {...props}>
+    <FormControl className={className}>
       <Controller
         as={(
-          <MuiPickersUtilsProvider utils={DateFnsUtils} inputRef={inputRef}>
+          <MuiPickersUtilsProvider utils={DateFnsUtils} locale={enLocale}>
             <KeyboardDatePicker
               autoOk
               margin="normal"
@@ -72,29 +70,26 @@ DatePickerDialog.defaultProps = {
   name: '',
   label: '',
   defaultValue: null,
-  children: null,
   value: null,
   format: 'YYYY-MM-dd',
-  inputRef: null,
   required: false,
+  className: '',
 };
 
 DatePickerDialog.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
   defaultValue: PropTypes.string,
-  children: PropTypes.element,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.instanceOf(Date),
   ]),
   setValue: PropTypes.func.isRequired,
-  getValues: PropTypes.func.isRequired,
   watch: PropTypes.func.isRequired,
   format: PropTypes.string,
-  inputRef: PropTypes.func,
   required: PropTypes.bool,
   control: PropTypes.shape({}).isRequired,
+  className: PropTypes.string,
 };
 
 export default DatePickerDialog;

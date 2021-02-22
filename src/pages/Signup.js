@@ -289,10 +289,7 @@ function Signup() {
                 watch={watch}
                 setValue={setValue}
                 value={getValues('dob')}
-                getValues={getValues}
-                defaultValue=""
                 name="dob"
-                inputRef={register({ valueAsDate: true })}
               />
               {errors.dob && <span role="alert">{errors.dob.message}</span>}
             </Grid>
