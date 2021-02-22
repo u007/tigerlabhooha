@@ -36,10 +36,10 @@ const ReactHookFormSelect = ({
 ReactHookFormSelect.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
-  control: PropTypes.func.isRequired,
+  control: PropTypes.shape({}).isRequired,
   required: PropTypes.bool,
   defaultValue: PropTypes.string,
-  children: PropTypes.element,
+  children: PropTypes.arrayOf(PropTypes.element),
 };
 
 ReactHookFormSelect.defaultProps = {

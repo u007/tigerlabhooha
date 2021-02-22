@@ -91,10 +91,10 @@ DatePickerDialog.propTypes = {
   setValue: PropTypes.func.isRequired,
   getValues: PropTypes.func.isRequired,
   watch: PropTypes.func.isRequired,
-  format: PropTypes.func,
+  format: PropTypes.string,
   inputRef: PropTypes.func,
   required: PropTypes.bool,
-  control: PropTypes.func.isRequired,
+  control: PropTypes.shape({}).isRequired,
 };
 
 export default DatePickerDialog;
