@@ -78,7 +78,7 @@ function Users() {
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.name}>
+                <TableRow key={row.id}>
                   <TableCell component="th" scope="row">
                     {row.id}
                   </TableCell>

@@ -2,7 +2,7 @@ import React from 'react';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
-import { Controller, Control } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import PropTypes from 'prop-types';
 
 const ReactHookFormSelect = ({
@@ -36,7 +36,7 @@ const ReactHookFormSelect = ({
 ReactHookFormSelect.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
-  control: PropTypes.instanceOf(Control).isRequired,
+  control: PropTypes.func.isRequired,
   required: PropTypes.bool,
   defaultValue: PropTypes.string,
   children: PropTypes.element,

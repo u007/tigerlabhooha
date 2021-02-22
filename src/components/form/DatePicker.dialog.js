@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import FormControl from '@material-ui/core/FormControl';
-import { Controller, Control } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
@@ -94,7 +94,7 @@ DatePickerDialog.propTypes = {
   format: PropTypes.func,
   inputRef: PropTypes.func,
   required: PropTypes.bool,
-  control: PropTypes.instanceOf(Control).isRequired,
+  control: PropTypes.func.isRequired,
 };
 
 export default DatePickerDialog;
