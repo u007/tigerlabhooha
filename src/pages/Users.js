@@ -35,7 +35,7 @@ function Users() {
     }).catch((err) => {
       setFetchError(err);
     });
-  });
+  }, []);
 
   return (
     <div className="App">
