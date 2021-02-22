@@ -1,10 +1,9 @@
-
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
-} from "react-router-dom";
+  Link,
+} from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
@@ -20,6 +19,7 @@ import Signup from './pages/Signup';
 import Users from './pages/Users';
 
 import './App.css';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,

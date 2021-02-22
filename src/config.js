@@ -1,4 +1,3 @@
-
 module.exports = {
-  apiURL: 'https://reqres.in/api/'
+  apiURL: 'https://reqres.in/api/',
 };

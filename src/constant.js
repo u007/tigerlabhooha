@@ -1,4 +1,3 @@
-
 module.exports = {
-  FETCH_FAIL: 'FetchFail'
+  FETCH_FAIL: 'FetchFail',
 };

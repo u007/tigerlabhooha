@@ -1,15 +1,15 @@
-import React from "react";
-import DateFnsUtils from '@date-io/date-fns';
+import React from 'react';
 import TextField from '@material-ui/core/TextField';
 
 const DatePicker = ({
   name,
-  format,
-  inputRef,
   ...props
-}) => {
-  return (
-    <TextField name={name} type="datetime-local" {...props} />
-  );
+}) => (
+  <TextField name={name} type="datetime-local" {...props} />
+);
+
+DatePicker.propTypes = {
+  name: React.String.isRequired,
 };
+
 export default DatePicker;
